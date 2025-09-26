@@ -7,25 +7,31 @@ import os
 class Libadalang(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
+
+    @property
+    def branch(self):
+        return "master"
 
     @property
     def tarball(self):
-        return "libadalang-%s.tar.gz" % self.version
+        return "libadalang-%s.tar.gz" % self.branch
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/libadalang/releases/download/v%s/libadalang-%s.tar.gz"
-                % (self.version, self.version),
-            )
+                url="https://github.com/AdaCore/libadalang/archive/refs/heads/%s.tar.gz"
+                % self.branch,
+            ),
         ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball, publish=True, dest="")]
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+        ]
 
     @property
     def build_deps(self):
@@ -40,7 +46,8 @@ class Libadalang(spec("common")):
             Anod.Dependency("langkit_support", track=True),
             Anod.Dependency("xmlada", track=True),
             Anod.Dependency("prettier_ada", track=True),
-            Anod.Dependency("vss", track=True),
+            Anod.Dependency("vss_text", track=True),
+            Anod.Dependency("langkit", track=True),
         ]
 
     @Anod.primitive()
@@ -48,7 +55,9 @@ class Libadalang(spec("common")):
         for m in self.deps:
             self.deps[m].setenv()
 
-        gpr_file = os.path.join(self["SRC_DIR"], "libadalang.gpr")
+        self.shell("python", "-m", "langkit.scripts.lkm", "generate", cwd=self["SRC_DIR"])
+
+        gpr_file = os.path.join(self["SRC_DIR"], "build", "libadalang.gpr")
         build_mode = "prod"
 
         for library_type in ["static"]:

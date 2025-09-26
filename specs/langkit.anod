@@ -1,0 +1,108 @@
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+import os
+
+class Langkit(spec("common")):
+    @property
+    def version(self):
+        return "26.0.0"
+
+    @property
+    def branch(self):
+        return "master"
+
+    @property
+    def tarball(self):
+        return "langkit-%s.zip" % self.branch
+
+    @property
+    def adasat_branch(self):
+        return "master"
+    
+    @property
+    def adasat_tarball(self):
+        return "adasat-%s.zip" % self.adasat_branch
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/adacore/langkit/archive/refs/heads/%s.zip"
+                % self.branch,
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.adasat_tarball,
+                url="https://github.com/adacore/adasat/archive/refs/heads/%s.zip"
+                % self.adasat_branch,
+            ),
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+            Anod.Source(name=self.adasat_tarball, publish=True, dest="langkit/adasat"),
+        ]
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+            Anod.Dependency("libgpr", track=True),
+            Anod.Dependency("gnatcoll", track=True),
+            Anod.Dependency("gnatcoll-bindings", track=True),
+            Anod.Dependency("adasat", track=True),
+            Anod.Dependency("prettier_ada"),
+            Anod.Dependency("vss_text"),
+            Anod.Dependency("langkit_support"),
+            Anod.Dependency("gmp", qualifier="shared_lib"),
+        ]
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        self.shell("pip", "install", "-r", os.path.join(self["SRC_DIR"], "requirements-github.txt"))
+        self.shell("pip", "install", "-r", os.path.join(self["SRC_DIR"], "requirements-pypi.txt"))
+        self.shell("pip", "install", self["SRC_DIR"])
+
+        build_mode = "prod"
+
+        for library_type in ["relocatable"]:
+            self.shell(
+                "python",
+                "manage.py",
+                "make",
+                "--no-mypy",
+                "--no-langkit-support",
+                "-j" + str(self.jobs),
+                "--library-types=" + library_type,
+                "--build-mode=" + build_mode,
+                cwd=self["SRC_DIR"],
+            )
+
+            self.shell(
+                "python",
+                "-m",
+                "langkit.scripts.lkm",
+                "install",
+                "-c",
+                "lkt/langkit.yaml",
+                self["INSTALL_DIR"],
+                "--library-types=" + library_type,
+                "--build-mode=" + build_mode,
+                cwd=self["SRC_DIR"],
+            )
+
+            self.shell(
+                "pip",
+                "install",
+                "lkt/build/python",
+                cwd=self["SRC_DIR"]
+            )
+
+        self.clean()
