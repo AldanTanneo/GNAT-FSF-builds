@@ -1,0 +1,84 @@
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+import os
+
+
+class VssText(spec("common")):
+    @property
+    def version(self):
+        return "26.0.0"
+
+    @property
+    def branch(self):
+        return "main"
+
+    @property
+    def tarball(self):
+        return "vss-text-%s.zip" % self.branch
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/AdaCore/vss-text/archive/refs/heads/%s.zip"
+                % self.branch
+            )
+        ]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+        ]
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        build_profile = "release"
+        gpr_files = [
+            os.path.join(self["SRC_DIR"], gpr)
+            for gpr in (
+                "gnat/vss_common.gpr",
+                "gnat/vss_gnat.gpr",
+                "gnat/vss_text.gpr",
+            )
+        ]
+
+        for library_type in ["static", "relocatable"]:
+            for gpr in gpr_files:
+                self.shell(
+                    "gprbuild",
+                    "-p",
+                    "-P",
+                    gpr,
+                    "-j" + str(self.jobs),
+                    "--relocate-build-tree=" + library_type,
+                    "-XVSS_LIBRARY_TYPE=" + library_type,
+                    "-XVSS_BUILD_PROFILE=" + build_profile,
+                )
+
+            for gpr in gpr_files:
+                self.shell(
+                    "gprinstall",
+                    "-f",
+                    "-p",
+                    "-P",
+                    gpr,
+                    "--relocate-build-tree=" + library_type,
+                    "--prefix=" + self["INSTALL_DIR"],
+                    "-XVSS_BUILD_PROFILE=" + build_profile,
+                    "-XVSS_LIBRARY_TYPE=" + library_type,
+                    "--build-var=LIBRARY_TYPE",
+                    "--build-name=" + library_type,
+                )
+
+        self.clean()

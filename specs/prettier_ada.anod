@@ -6,19 +6,23 @@ import os
 class PrettierAda(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
+    
+    @property
+    def branch(self):
+        return "master"
 
     @property
     def tarball(self):
-        return "prettier_ada-%s.zip" % self.version
+        return "prettier_ada-%s.zip" % self.branch
     
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/adacore/prettier-ada/archive/v%s/prettier-ada-%s.zip"
-                % (self.version, self.version)
+                url="https://github.com/adacore/prettier-ada/archive/refs/heads/%s.zip"
+                % self.branch
             )
         ]
 
@@ -32,7 +36,7 @@ class PrettierAda(spec("common")):
             Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
             Anod.Dependency("gnatcoll", track=True),
-            Anod.Dependency("vss", track=True),
+            Anod.Dependency("vss_text", track=True),
         ]
     
     @Anod.primitive()
@@ -43,7 +47,7 @@ class PrettierAda(spec("common")):
         gpr_file = os.path.join(self["SRC_DIR"], "prettier_ada.gpr")
         build_mode = "prod"
 
-        for library_type in ["static"]:
+        for library_type in ["static", "relocatable"]:
             self.shell(
                 "gprbuild",
                 "-p",

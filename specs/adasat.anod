@@ -7,19 +7,23 @@ import os
 class AdaSAT(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
+
+    @property
+    def branch(self):
+        return "master"
 
     @property
     def tarball(self):
-        return "adasat-%s.tar.gz" % self.version
+        return "adasat-%s.tar.gz" % self.branch
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/AdaSAT/archive/v%s.tar.gz"
-                % self.version,
+                url="https://github.com/AdaCore/AdaSAT/archive/refs/heads/%s.tar.gz"
+                % self.branch,
             )
         ]
 
@@ -42,7 +46,7 @@ class AdaSAT(spec("common")):
         gpr_file = os.path.join(self["SRC_DIR"], "adasat.gpr")
         build_mode = "prod"
 
-        for library_type in ["static"]:
+        for library_type in ["static", "relocatable"]:
             self.shell(
                 "gprbuild",
                 "-p",

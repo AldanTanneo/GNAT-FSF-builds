@@ -8,14 +8,18 @@ import os
 from datetime import date
 
 
-class LibGPR2(spec("common")):
+class GPR2(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
+
+    @property
+    def branch(self):
+        return "main"
 
     @property
     def tarball(self):
-        return "gpr-%s.tar.gz" % self.version
+        return "gpr2-%s.tar.gz" % self.branch
 
     @property
     def tools_only(self):
@@ -26,8 +30,8 @@ class LibGPR2(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
-                % self.version,
+                url="https://github.com/AdaCore/gpr/archive/refs/heads/%s.tar.gz"
+                % self.branch,
             ),
         ]
 
@@ -100,9 +104,8 @@ class LibGPR2(spec("common")):
 
         self.update_version()
 
-        gprconfig_kb_dir = os.path.join(self.deps["gprconfig_kb"]["SRC_DIR"],
-                                        "db")
-        
+        gprconfig_kb_dir = os.path.join(self.deps["gprconfig_kb"]["SRC_DIR"], "db")
+
         make = Make(self, exec_dir=self["SRC_DIR"])
         make("setup")
         make.set_var("GPR2KBDIR", gprconfig_kb_dir)
@@ -113,14 +116,13 @@ class LibGPR2(spec("common")):
         make("install")
 
         if self.tools_only:
-           rm(os.path.join(self["INSTALL_DIR"], 'share'), recursive=True)
-           rm(os.path.join(self["INSTALL_DIR"], 'include'), recursive=True)
-           rm(os.path.join(self["INSTALL_DIR"], 'lib'), recursive=True)
+            rm(os.path.join(self["INSTALL_DIR"], "share"), recursive=True)
+            rm(os.path.join(self["INSTALL_DIR"], "include"), recursive=True)
+            rm(os.path.join(self["INSTALL_DIR"], "lib"), recursive=True)
 
-           bin_dir = os.path.join(self["INSTALL_DIR"], 'bin', "*")
-           for file in ls(bin_dir):
-               if os.path.basename(file) not in self.productized_tools:
-                  rm(file)
-           
+            bin_dir = os.path.join(self["INSTALL_DIR"], "bin", "*")
+            for file in ls(bin_dir):
+                if os.path.basename(file) not in self.productized_tools:
+                    rm(file)
 
         self.clean()

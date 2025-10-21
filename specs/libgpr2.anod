@@ -15,19 +15,27 @@ class LibGPR2(spec("common")):
 
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
+
+    @property
+    def branch(self):
+        return "main"
 
     @property
     def lk_version(self):
-        return "25.0.0"
+        return "26.0.0"
+
+    @property
+    def lk_branch(self):
+        return "master"
 
     @property
     def tarball(self):
-        return "gpr-%s.tar.gz" % self.version
+        return "gpr2-%s.tar.gz" % self.branch
 
     @property
     def lk_tarball(self):
-        return "langkit-py-%s.tar.gz" % self.lk_version
+        return "langkit-py-%s.tar.gz" % self.lk_branch
 
     @property
     def build_space_name(self):
@@ -41,13 +49,13 @@ class LibGPR2(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
-                % (self.version),
+                url="https://github.com/AdaCore/gpr/archive/refs/heads/%s.tar.gz"
+                % self.branch,
             ),
             self.HTTPSSourceBuilder(
                 name=self.lk_tarball,
-                url="https://github.com/AdaCore/langkit/archive/v%s.tar.gz"
-                % self.lk_version,
+                url="https://github.com/AdaCore/langkit/archive/refs/heads/%s.tar.gz"
+                % self.lk_branch,
             ),
         ]
 

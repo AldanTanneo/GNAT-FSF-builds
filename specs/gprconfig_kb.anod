@@ -5,19 +5,23 @@ from e3.anod.loader import spec
 class GPRconfig_KB(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
+
+    @property
+    def branch(self):
+        return "master"
 
     @property
     def tarball(self):
-        return "gprconfig_kb-%s.tar.gz" % self.version
+        return "gprconfig_kb-%s.tar.gz" % self.branch
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gprconfig_kb/archive/v%s/%s"
-                % (self.version, self.tarball),
+                url="https://github.com/AdaCore/gprconfig_kb/archive/refs/heads/%s.tar.gz"
+                % self.branch,
             )
         ]
 
@@ -29,4 +33,4 @@ class GPRconfig_KB(spec("common")):
     def build(self):
         # Nothing to build, we just want to sources to be available for
         # gprbuild.
-        None
+        pass

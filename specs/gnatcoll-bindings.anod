@@ -8,19 +8,23 @@ import os
 class GNATcollBindings(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
+    
+    @property
+    def branch(self):
+        return "master"
 
     @property
     def tarball(self):
-        return "gnatcoll-bindings-%s.tar.gz" % self.version
+        return "gnatcoll-bindings-%s.tar.gz" % self.branch
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gnatcoll-bindings/archive/v%s.tar.gz"
-                % self.version,
+                url="https://github.com/AdaCore/gnatcoll-bindings/archive/refs/heads/%s.tar.gz"
+                % self.branch,
             )
         ]
 
@@ -37,6 +41,9 @@ class GNATcollBindings(spec("common")):
             Anod.Dependency("libgpr"),
             Anod.Dependency("xmlada"),
             Anod.Dependency("gmp"),
+            Anod.Dependency("gmp",
+                            qualifier="shared_lib",
+                            local_name="gmp_shared"),
             Anod.Dependency("zlib"),
         ]
         if self.env.target.os.name == "windows":
@@ -56,7 +63,7 @@ class GNATcollBindings(spec("common")):
                 "build",
                 "--jobs=" + str(self.jobs),
                 "--reconfigure",
-                "--library-types", "static",
+                "--library-types", "static,relocatable",
             )
 
             self.shell(

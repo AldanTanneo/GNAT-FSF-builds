@@ -4,26 +4,17 @@ from e3.anod.loader import spec
 import os
 
 
-class LangkikSupport(spec("common")):
-    @property
-    def version(self):
-        return "26.0.0"
-
-    @property
-    def branch(self):
-        return "master"
-
+class SarifAda(spec("common")):
     @property
     def tarball(self):
-        return "langkit_support-%s.zip" % self.branch
+        return "sarif-ada-main.zip"
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/adacore/langkit/archive/refs/heads/%s.zip"
-                % self.branch,
+                url="https://github.com/AdaCore/sarif-ada/archive/refs/heads/main.zip",
             )
         ]
 
@@ -36,16 +27,8 @@ class LangkikSupport(spec("common")):
         return [
             Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
-            Anod.Dependency("libgpr", track=True),
-            Anod.Dependency("gnatcoll", track=True),
-            Anod.Dependency("gnatcoll-bindings", track=True),
-            Anod.Dependency("xmlada", track=True),
-            Anod.Dependency("adasat", track=True),
-            Anod.Dependency("prettier_ada"),
             Anod.Dependency("vss_text"),
-            Anod.Dependency("gmp",
-                            qualifier="shared_lib",
-                            local_name="gmp_shared"),
+            Anod.Dependency("vss_extra"),
         ]
 
     @Anod.primitive()
@@ -53,10 +36,10 @@ class LangkikSupport(spec("common")):
         for m in self.deps:
             self.deps[m].setenv()
 
-        gpr_file = os.path.join(self["SRC_DIR"], "langkit/support/langkit_support.gpr")
-        build_mode = "prod"
+        gpr_file = os.path.join(self["SRC_DIR"], "sarif_ada.gpr")
+        build_mode = "release"
 
-        for library_type in ["static", "relocatable"]:
+        for library_type in ["static"]:
             self.shell(
                 "gprbuild",
                 "-p",
@@ -64,8 +47,8 @@ class LangkikSupport(spec("common")):
                 gpr_file,
                 "-j" + str(self.jobs),
                 "--relocate-build-tree=" + library_type,
-                "-XBUILD_MODE=" + build_mode,
-                "-XLIBRARY_TYPE=" + library_type,
+                "-XSARIF_BUILD_PROFILE=" + build_mode,
+                "-XSARIF_ADA_LIBRARY_TYPE=" + library_type,
             )
 
             self.shell(
@@ -76,8 +59,8 @@ class LangkikSupport(spec("common")):
                 gpr_file,
                 "--relocate-build-tree=" + library_type,
                 "--prefix=" + self["INSTALL_DIR"],
-                "-XBUILD_MODE=" + build_mode,
-                "-XLIBRARY_TYPE=" + library_type,
+                "-XSARIF_BUILD_PROFILE=" + build_mode,
+                "-XSARIF_ADA_LIBRARY_TYPE=" + library_type,
                 "--build-var=LIBRARY_TYPE",
                 "--build-name=" + library_type,
             )
