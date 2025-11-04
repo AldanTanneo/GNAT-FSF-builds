@@ -1,24 +1,33 @@
 from e3.anod.helper import Make
 from e3.anod.loader import spec
-from e3.anod.package import SourceBuilder
 from e3.anod.spec import Anod
-from e3.fs import cp, mv, sync_tree, ls, rm, mkdir
+from e3.fs import mv, sync_tree, ls, rm, mkdir
 from e3.os.fs import chmod
+
+import lib.anod.util as util
+
 import os
+import time
+from functools import cached_property
 
 
 class SPARK2014(spec("common")):
+    @cached_property
+    def prerelease(self):
+        tm = time.gmtime()
+        return f"{tm.tm_year:04}{tm.tm_mon:02}{tm.tm_mday:02}"
+
     @property
     def version(self):
-        return "15.1.0"
-    
+        return "16.0.0"
+
     @property
-    def spark_branch(self):
-        return "fsf-15"
+    def branch(self):
+        return "fsf"
 
     @property
     def tarball(self):
-        return "spark2014-%s.tar.gz" % self.version
+        return "spark2014-%s-%s.tar.gz" % (self.branch, self.prerelease)
 
     @property
     def exec_suffix(self):
@@ -28,13 +37,21 @@ class SPARK2014(spec("common")):
             return ""
 
     @property
+    def gcc_branch(self):
+        return "16"
+
+    @property
     def gcc_tarball(self):
-        return "gcc-%s.tar.gz" % self.version
+        return util.GCCSnapshotTarballFinder.get(self.gcc_branch).tarball
+
+    @property
+    def sparklib_branch(self):
+        return "fsf"
 
     @property
     def sparklib_tarball(self):
-        return "sparkib-%s.tar.gz" % self.version
-    
+        return "sparklib-%s-%s.tar.gz" % (self.sparklib_branch, self.prerelease)
+
     @property
     def cvc5_version(self):
         return "1.2.1"
@@ -80,28 +97,27 @@ class SPARK2014(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.gcc_tarball,
-                url="https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s"
-                % (self.version, self.gcc_tarball),
+                url=util.GCCSnapshotTarballFinder.get(self.gcc_branch).url,
             ),
             self.HTTPSSourceBuilder(
                 name=self.tarball,
                 url="https://github.com/adacore/spark2014/tarball/%s"
-                % self.spark_branch,
+                % self.branch
             ),
             self.HTTPSSourceBuilder(
                 name=self.sparklib_tarball,
                 url="https://github.com/adacore/sparklib/tarball/%s"
-                % self.spark_branch,
+                % self.sparklib_branch
             ),
             self.HTTPSSourceBuilder(
                 name=self.cvc5_zip,
                 url="https://github.com/cvc5/cvc5/releases/download/cvc5-%s/%s"
-                % (self.cvc5_version, self.cvc5_zip),
+                % (self.cvc5_version, self.cvc5_zip)
             ),
             self.HTTPSSourceBuilder(
                 name=self.z3_zip,
                 url="https://github.com/Z3Prover/z3/releases/download/z3-%s/%s"
-                % (self.z3_version, self.z3_zip),
+                % (self.z3_version, self.z3_zip)
             ),
         ]
 
@@ -136,6 +152,9 @@ class SPARK2014(spec("common")):
             Anod.Dependency("langkit_support"),
             Anod.Dependency("adasat", track=True),
             Anod.Dependency("libadalang"),
+            Anod.Dependency("vss_text"),
+            Anod.Dependency("vss_extra"),
+            Anod.Dependency("sarif_ada"),
         ]
 
         if self.env.target.os.name == "windows":

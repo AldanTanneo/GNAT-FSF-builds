@@ -5,8 +5,10 @@ The snapshots built from this branch are published in an Alire index at the `sna
 
 # How to build
 
+## Setup
+
 To start the builds you will need `python3` (up to version 3.12) and the `e3-core` package.
-This can be done in a virtual env, e.g.:
+This should be done in a virtual env (some extra packages will be installed when building langkit), e.g.:
 
 ```console
 $ python3 -m venv my-virtual-env
@@ -18,7 +20,14 @@ A Python 3.12 specific environment can be created with [`uv`](https://docs.astra
 
 ```console
 $ uv venv --python=3.12
+$ uv pip install e3-core==22.10.0
+$ uv pip install pip
+# needed because langkit needs to install its own python package
 ```
+
+**The scripts do NOT work with python 3.13 and above** (for now)
+
+## Building
 
 To build a spec, for example `mpc`, run the `anod` script:
 ```console

@@ -19,8 +19,8 @@ class ReleasePackage(spec("common")):
 
         if self.parsed_qualifier["package"] not in valid_packages:
             raise Exception(
-                "Invalid package: '%s' (expects: %s)"
-                % (self.parsed_qualifier["package"], " or ".join(valid_packages))
+                "Invalid package: '%s' (expects one of: %s)"
+                % (self.parsed_qualifier["package"], ", ".join(valid_packages))
             )
 
         return self.parsed_qualifier["package"]
@@ -43,20 +43,19 @@ class ReleasePackage(spec("common")):
         """
         package = self.package
 
-        release = {
-            "gprbuild": "1",
-            "gnatcov": "1",
-            "gnatprove": "1",
-            "gnat": self.deps["gcc"].prerelease,  # YYYYMMDD
-        }
-
-        if isinstance(r := release[package], dict):
-            if self.env.target.triplet in r:
-                return r[self.env.target.triplet]
-            else:
-                return r["_"]
+        if package == "gnat":
+            return self.deps["gcc"].prerelease # YYYYMMDD
+        elif package == "gnatprove":
+            return self.deps["spark2014"].prerelease
+        elif package == "gprbuild":
+            return "1"
+        elif package == "gnatcov":
+            return "1"
         else:
-            return release[package]
+            raise Exception(
+                "Invalid package: '%s' (expects one of: %s)"
+                % (package, ", ".join(valid_packages))
+            )
 
     @property
     def release_name(self):
