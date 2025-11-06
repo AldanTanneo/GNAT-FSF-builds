@@ -1,4 +1,4 @@
-from e3.os.fs import touch, unixpath
+from e3.os.fs import touch, unixpath, cd
 from e3.fs import cp
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
@@ -47,6 +47,7 @@ class ZLib(spec("common")):
         for m in self.deps:
             self.deps[m].setenv()
 
+        cd(self["SRC_DIR"])
         configure = Configure(self, exec_dir=self["SRC_DIR"], auto_target=False)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
         configure.add("--static")

@@ -16,7 +16,7 @@ class GPRbuild(spec("gh-artifact")):
 
     @property
     def branch(self):
-        return "master"
+        return "26.0"
 
     @property
     def tarball(self):

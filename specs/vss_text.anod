@@ -47,7 +47,6 @@ class VssText(spec("common")):
         gpr_files = [
             os.path.join(self["SRC_DIR"], gpr)
             for gpr in (
-                "gnat/vss_common.gpr",
                 "gnat/vss_gnat.gpr",
                 "gnat/vss_text.gpr",
             )
@@ -62,8 +61,8 @@ class VssText(spec("common")):
                     gpr,
                     "-j" + str(self.jobs),
                     "--relocate-build-tree=" + library_type,
-                    "-XVSS_LIBRARY_TYPE=" + library_type,
-                    "-XVSS_BUILD_PROFILE=" + build_profile,
+                    "-XLIBRARY_TYPE=" + library_type,
+                    "-XBUILD_PROFILE=" + build_profile,
                 )
 
             for gpr in gpr_files:
@@ -75,8 +74,8 @@ class VssText(spec("common")):
                     gpr,
                     "--relocate-build-tree=" + library_type,
                     "--prefix=" + self["INSTALL_DIR"],
-                    "-XVSS_BUILD_PROFILE=" + build_profile,
-                    "-XVSS_LIBRARY_TYPE=" + library_type,
+                    "-XBUILD_PROFILE=" + build_profile,
+                    "-XLIBRARY_TYPE=" + library_type,
                     "--build-var=LIBRARY_TYPE",
                     "--build-name=" + library_type,
                 )

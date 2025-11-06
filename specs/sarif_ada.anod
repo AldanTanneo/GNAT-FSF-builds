@@ -47,8 +47,8 @@ class SarifAda(spec("common")):
                 gpr_file,
                 "-j" + str(self.jobs),
                 "--relocate-build-tree=" + library_type,
-                "-XSARIF_BUILD_PROFILE=" + build_mode,
-                "-XSARIF_ADA_LIBRARY_TYPE=" + library_type,
+                "-XBUILD_PROFILE=" + build_mode,
+                "-XLIBRARY_TYPE=" + library_type,
             )
 
             self.shell(
@@ -59,8 +59,8 @@ class SarifAda(spec("common")):
                 gpr_file,
                 "--relocate-build-tree=" + library_type,
                 "--prefix=" + self["INSTALL_DIR"],
-                "-XSARIF_BUILD_PROFILE=" + build_mode,
-                "-XSARIF_ADA_LIBRARY_TYPE=" + library_type,
+                "-XBUILD_PROFILE=" + build_mode,
+                "-XLIBRARY_TYPE=" + library_type,
                 "--build-var=LIBRARY_TYPE",
                 "--build-name=" + library_type,
             )

@@ -54,8 +54,8 @@ class AdaSAT(spec("common")):
                 gpr_file,
                 "-j" + str(self.jobs),
                 "--relocate-build-tree=" + library_type,
-                "-XADASAT_BUILD_MODE=" + build_mode,
-                "-XADASAT_LIBRARY_TYPE=" + library_type,
+                "-XBUILD_MODE=" + build_mode,
+                "-XLIBRARY_TYPE=" + library_type,
             )
 
             self.shell(
@@ -66,8 +66,8 @@ class AdaSAT(spec("common")):
                 gpr_file,
                 "--relocate-build-tree=" + library_type,
                 "--prefix=" + self["INSTALL_DIR"],
-                "-XADASAT_BUILD_MODE=" + build_mode,
-                "-XADASAT_LIBRARY_TYPE=" + library_type,
+                "-XBUILD_MODE=" + build_mode,
+                "-XLIBRARY_TYPE=" + library_type,
                 "--build-var=LIBRARY_TYPE",
                 "--build-name=" + library_type,
             )
