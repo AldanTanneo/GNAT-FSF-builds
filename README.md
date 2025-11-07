@@ -50,6 +50,8 @@ $ ./anod build release_package --qualifier=package=<package name>
 
 Currently supported package names are `gnat`, `gprbuild` and `gnatprove`.
 
+Building libadalang (required for gnatprove) requires first generating the libadalang sources in a Linux environment. For this, use `./anod build libadalang --qualifier=src`. Then, the sources (in `in_artifacts/libadalang-src`) can be copied over to your target environment (in the same `in_artifacts` directory - this is done in GitHub actions), and will be automatically picked up by the libadalang build.
+
 ## On Windows
 Only builds in the msys2 mingw64 environement are supported.
 You will need:

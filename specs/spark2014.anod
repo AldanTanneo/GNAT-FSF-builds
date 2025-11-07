@@ -14,8 +14,7 @@ from functools import cached_property
 class SPARK2014(spec("common")):
     @cached_property
     def prerelease(self):
-        tm = time.gmtime()
-        return f"{tm.tm_year:04}{tm.tm_mon:02}{tm.tm_mday:02}"
+        return time.strftime("%Y%m%d", time.gmtime())
 
     @property
     def version(self):

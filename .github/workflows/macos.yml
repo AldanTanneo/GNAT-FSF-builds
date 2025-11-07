@@ -91,7 +91,37 @@ jobs:
         name: gnat-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
+  libadalang_src:
+    name: Generate Libadalang sources Linux
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Install packages with apt
+      run: |-
+        sudo apt update
+        sudo apt install flex
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Build Langkit
+      run: python3 ./anod build langkit -v --loglevel DEBUG --enable-cleanup
+    - name: Generate Libadalang
+      run: python3 ./anod build libadalang --qualifier=src -v --loglevel DEBUG --enable-cleanup
+    - name: Upload artifact 'libadalang-generated-src'
+      uses: actions/upload-artifact@v4
+      with:
+        name: libadalang-generated-src
+        path: sbx/*/libadalang/install/*
+        retention-days: 1
   spark:
+    needs:
+    - libadalang_src
     name: SPARK macOS
     runs-on: macos-13
     steps:
@@ -111,6 +141,11 @@ jobs:
       run: |-
         python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'libadalang-generated-src'
+      uses: actions/download-artifact@v4
+      with:
+        name: libadalang-generated-src
+        path: in_artifacts/libadalang-src/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
     - name: Package GNATprove

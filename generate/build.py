@@ -218,6 +218,7 @@ class Job(Yamlable[Host]):
     steps: list[RawStep]
 
     kind: JobKind = "python"
+    os_override: Host | None = None
     repo: Repository | None = None
     needs: list[str] = field(default_factory=list[str])
     matrix: dict[str, list[str]] = field(default_factory=dict[str, list[str]])
@@ -227,6 +228,8 @@ class Job(Yamlable[Host]):
     outputs: list[Artifact] = field(default_factory=list[Artifact])
 
     def to_yaml(self, ctx: Host) -> Yaml:
+        if self.os_override:
+            ctx = self.os_override
         res: Yaml = {}
 
         if len(self.matrix) != 0 or self.targets is not None:

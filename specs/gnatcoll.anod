@@ -47,10 +47,14 @@ class GNATcoll(spec("common")):
         for m in self.deps:
             self.deps[m].setenv()
 
+        enable_shared = "no"
+        if self.env.host.os.name == "linux":
+            enable_shared = "yes"
+
         make = Make(self, makefile=os.path.join(self["SRC_DIR"], "Makefile"), jobs=1)
         make.set_var("PROCESSORS", str(self.jobs))
         make.set_var("prefix", unixpath(self["INSTALL_DIR"]))
-        make.set_var("ENABLE_SHARED", "yes")
+        make.set_var("ENABLE_SHARED", enable_shared)
         make.set_var("INTEGRATED", "no")
         make.set_var("BUILD", "PROD")
         make()

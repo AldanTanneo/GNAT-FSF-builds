@@ -52,7 +52,11 @@ class VssText(spec("common")):
             )
         ]
 
-        for library_type in ["static", "relocatable"]:
+        library_types = ["static"]
+        if self.env.host.os.name == "linux":
+            library_types.append("relocatable")
+
+        for library_type in library_types:
             for gpr in gpr_files:
                 self.shell(
                     "gprbuild",

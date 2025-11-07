@@ -47,7 +47,11 @@ class PrettierAda(spec("common")):
         gpr_file = os.path.join(self["SRC_DIR"], "prettier_ada.gpr")
         build_mode = "prod"
 
-        for library_type in ["static", "relocatable"]:
+        library_types = ["static"]
+        if self.env.host.os.name == "linux":
+            library_types.append("relocatable")
+
+        for library_type in library_types:
             self.shell(
                 "gprbuild",
                 "-p",

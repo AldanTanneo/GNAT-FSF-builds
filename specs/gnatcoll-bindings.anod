@@ -55,6 +55,10 @@ class GNATcollBindings(spec("common")):
         for m in self.deps:
             self.deps[m].setenv()
 
+        library_types = "static"
+        if self.env.host.os.name == "linux":
+            library_types += ",relocatable"
+
         for comp in ["gmp", "iconv"]:
             cd(os.path.join(self["SRC_DIR"], comp))
             self.shell(
@@ -63,7 +67,7 @@ class GNATcollBindings(spec("common")):
                 "build",
                 "--jobs=" + str(self.jobs),
                 "--reconfigure",
-                "--library-types", "static,relocatable",
+                "--library-types", library_types,
             )
 
             self.shell(

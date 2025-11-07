@@ -108,12 +108,35 @@ def main():
         ],
     )
 
+    jobs["libadalang_src"] = Job(
+        "Generate Libadalang sources",
+        [
+            AnodBuild("Build Langkit", "langkit"),
+            AnodBuild("Generate Libadalang", "libadalang", ["--qualifier=src"]),
+        ],
+        os_override=host.Linux,
+        outputs=[
+            Artifact(
+                "libadalang-generated-src",
+                "sbx/*/libadalang/install/*",
+                retention_days=1,
+            ),
+        ],
+    )
+
     jobs["spark"] = Job(
         "SPARK",
         [
             AnodBuild("Build SPARK", "spark2014"),
             ReleasePackage("Package GNATprove", "gnatprove"),
             GhRelease("Release GNATprove", "gnatprove"),
+        ],
+        needs=["libadalang_src"],
+        inputs=[
+            Artifact(
+                "libadalang-generated-src",
+                "in_artifacts/libadalang-src/",
+            )
         ],
         outputs=[
             Artifact(
