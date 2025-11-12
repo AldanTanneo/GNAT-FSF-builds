@@ -273,7 +273,8 @@ class GCC(spec("gh-artifact")):
 
         if self.env.host.os.name == "windows":
             # https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=902c755930326cb4405672aa3ea13c35c653cbff
-            os.environ["CPPFLAGS"] = "-DCOM_NO_WINDOWS_H -Wno-error=suggest-attribute=format"
+            os.environ["CPPFLAGS"] = "-DCOM_NO_WINDOWS_H"
+            configure.add("--disable-werror")
 
         configure()
 
