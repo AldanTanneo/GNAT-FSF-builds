@@ -39,7 +39,7 @@ class Linux_Arm(Linux):
 
 
 class macOS(Unix):
-    runner = "macos-13"
+    runner = "macos-15-intel"
 
     @classmethod
     def setup_python(cls) -> list[RawStep]:

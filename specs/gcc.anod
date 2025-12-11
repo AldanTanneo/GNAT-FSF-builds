@@ -140,14 +140,15 @@ class GCC(spec("gh-artifact")):
 
             args.append("--disable-libcilkrts")
 
-            # HACK: use a fixed version of the macOS SDK because of fixed-include breakages
-            xcode = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk"
-            clu = "/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk"
+            clt_14 = "/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk"
+            clt_latest = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
 
-            args.append("--with-build-sysroot=%s" % xcode)
+            # HACK: use a fixed version of the macOS SDK because of fixed-include breakages
+            # TODO: probably change this in the GCC 16 release? hopefully the includes are fixed.
+            args.append("--with-build-sysroot=%s" % clt_14)
             args.append(
-                "--with-specs=%%{!sysroot=*:--sysroot=%%:if-exists-else(%s %s)}"
-                % (xcode, clu)
+                "--with-specs=%%{!-sysroot=*:--sysroot=%%:if-exists-else(%s %s)}"
+                % (clt_14, clt_latest)
             )
 
         if self.env.host.os.name != "darwin":
@@ -274,7 +275,10 @@ class GCC(spec("gh-artifact")):
         if self.env.host.os.name == "windows":
             # https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=902c755930326cb4405672aa3ea13c35c653cbff
             os.environ["CPPFLAGS"] = "-DCOM_NO_WINDOWS_H"
+
+            # trying to fix snapshot builds
             configure.add("--disable-werror")
+            configure.add("LDFLAGS=-lwsock32 -lws2_32")
 
         configure()
 
