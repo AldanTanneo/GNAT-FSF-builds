@@ -125,12 +125,12 @@ class GCC(spec("gh-artifact")):
             args.append("--disable-libcilkrts")
 
             # HACK: use a fixed version of the macOS SDK because of fixed-include breakages
-            clt_14 = "/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk"
+            clt_15 = "/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk"
             clt_latest = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
-            args.append("--with-build-sysroot=%s" % clt_14)
+            args.append("--with-build-sysroot=%s" % clt_15)
             args.append(
                 "--with-specs=%%{!-sysroot=*:--sysroot=%%:if-exists-else(%s %s)}"
-                % (clt_14, clt_latest)
+                % (clt_15, clt_latest)
             )
 
         if self.env.host.os.name != "darwin":

@@ -44,7 +44,7 @@ class macOS(Unix):
 
 
 class macOS_Arm(macOS):
-    runner = "macos-15"
+    runner = "macos-26"
 
     @classmethod
     def setup_python(cls) -> list[RawStep]:
