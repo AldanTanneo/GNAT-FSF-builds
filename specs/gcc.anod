@@ -295,8 +295,8 @@ class GCC(spec("gh-artifact")):
                 delete=False,
             )
 
-        # Add ld-classic wrapper
         if self.env.target.os.name == "darwin":
+            # Add ld-classic wrapper
             gcc = os.path.join(self["INSTALL_DIR"], "bin", "gcc")
             p = Run([gcc, "--print-prog-name=cc1"])
             libexec = os.path.dirname(p.out.strip())
@@ -304,4 +304,14 @@ class GCC(spec("gh-artifact")):
                 os.path.join(self["SRC_DIR"], "patches", patch_name),
                 libexec,
             )
+
+            # remove gcc-ar (causes link errors, system ar works)
+            gcc_ar = os.path.join(self["INSTALL_DIR"], "bin", "gcc-ar")
+            aarch64_gcc_ar = os.path.join(self["INSTALL_DIR"], "bin", "aarch64-apple-darwin25.2.0-gcc-ar")
+            if os.path.exists(gcc_ar)
+                os.remove(gcc_ar)
+            if os.path.exists(aarch64_gcc_ar):
+                os.remove(aarch64_gcc_ar)
+
+
         self.clean()
