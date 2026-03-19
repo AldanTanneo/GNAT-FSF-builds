@@ -49,7 +49,10 @@ class GNATformat(spec("common")):
             Anod.Dependency("libgpr2", track=True),
             Anod.Dependency("adasat", track=True),
             Anod.Dependency("langkit_support", track=True),
+            Anod.Dependency("gmp", track=True),
         ]
+        if self.env.target.os.name == "windows":
+            deps.append(Anod.Dependency("libiconv", track=True))
         return deps
 
     @Anod.primitive()
