@@ -12,18 +12,18 @@ patch_name = "gprbuild-no-static.patch"
 class GPRbuild(spec("gh-artifact")):
     @property
     def version(self):
-        return "26.0.0"
+        return "26.2"
 
     @property
     def tarball(self):
-        return "gprbuild-%s.tar.gz" % self.version
+        return "gprbuild-%s.zip" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gprbuild/archive/refs/tags/v%s.tar.gz"
+                url="https://github.com/AdaCore/gprbuild/archive/refs/heads/%s.zip"
                 % self.version,
             ),
             self.LocalSourceBuilder(name=patch_name),

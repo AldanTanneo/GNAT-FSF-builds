@@ -5,8 +5,12 @@ import os
 
 class LLVM(spec("binary_install")):
     @property
+    def major_version(self):
+        return "19"
+
+    @property
     def version(self):
-        return "20.1.8"
+        return "19.1.7"
 
     @property
     def platform(self):
@@ -14,19 +18,18 @@ class LLVM(spec("binary_install")):
             return "x86_64-pc-windows-msvc"
         if self.env.host.os.name == "darwin":
             if self.host_is_macos_arm:
-                return "macos-arm64"
+                return "macOS-ARM64"
             else:
-                # Unsupported
-                raise NotImplementedError
+                return "macOS-X64"
         else:
             if self.env.host.cpu.name == "x86_64":
-                return "linux-x64"
+                return "linux-X64"
             else:
-                return "linux-arm64"
+                return "aarch64-linux-gnu"
 
     @property
     def tool(self):
-        if self.env.host.os.name == "windows":
+        if self.env.host.os.name == "windows" or (self.env.host.os.name == "linux" and self.env.host.cpu.name == "aarch64"):
             return "clang+llvm"
         else:
             return "LLVM"

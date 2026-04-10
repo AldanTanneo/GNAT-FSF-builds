@@ -11,11 +11,11 @@ from datetime import date
 class LibGPR2(spec("common")):
     @property
     def version(self):
-        return "26.0.0"
+        return "26.2"
 
     @property
     def tarball(self):
-        return "gpr-%s.tar.gz" % self.version
+        return "gpr-%s.zip" % self.version
 
     @property
     def tools_only(self):
@@ -26,7 +26,7 @@ class LibGPR2(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
+                url="https://github.com/AdaCore/gpr/archive/refs/heads/%s.zip"
                 % self.version,
             ),
         ]
@@ -83,9 +83,12 @@ class LibGPR2(spec("common")):
         """List of tools from gpr2-tools.gpr we want to push in the released
         package"""
         return [
+            "gprbuild",
             "gprclean",
+            "gprdoc",
             "gprinspect",
             "gprinstall",
+            "gprdriver",
             "gprls",
             "gprremote",
             "gprconfig",
